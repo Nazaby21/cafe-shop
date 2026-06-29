@@ -12,13 +12,26 @@ router = APIRouter(prefix="/user", tags=["user"])
 
 user_service = UserService()
 
-@router.post("", response_model=UserResponse)
-def create_user(request: CreateUserRequest,db: Session = Depends(get_db)):
-    return user_service.create_user(db, request)
 
-@router.get("", response_model=list[UserResponse])
+@router.post("", response_model=ApiResponse[UserResponse])
+def create_user(request: CreateUserRequest, db: Session = Depends(get_db)):
+    user = user_service.create_user(db, request)
+    return ApiResponse(
+        success=True,
+        message="User Created successfully",
+        data=user
+    )
+
+
+@router.get("", response_model=ApiResponse[list[UserResponse]])
 def read_all_users(db: Session = Depends(get_db)):
-    return user_service.get_all_user(db)
+    user = user_service.get_all_user(db)
+    return ApiResponse(
+        success=True,
+        message="User fetched successfully",
+        data=user
+    )
+
 
 @router.get("/{user_id}", response_model=ApiResponse[UserResponse])
 async def get_user(user_id: int, db: Session = Depends(get_db)):
@@ -30,10 +43,15 @@ async def get_user(user_id: int, db: Session = Depends(get_db)):
     )
 
 
-@router.put("/{user_id}", response_model=UserResponse)
+@router.put("/{user_id}", response_model=ApiResponse[UserResponse])
 def update_user(
-    user_id: int,
-    request: UpdateUserRequest,
-    db: Session = Depends(get_db)
+        user_id: int,
+        request: UpdateUserRequest,
+        db: Session = Depends(get_db)
 ):
-    return user_service.update_user(db, user_id, request)
+    user = user_service.update_user(db, user_id, request)
+    return ApiResponse(
+        success=True,
+        message="User Updated successfully",
+        data=user
+    )

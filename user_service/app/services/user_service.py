@@ -34,12 +34,12 @@ class UserService:
     def update_user(self, db: Session, user_id: int, request: UpdateUserRequest):
         user = user_repo.get_by_id(db, user_id)
         if not user:
-            raise HTTPException(status_code= 404, detail = "User not found")
+            raise UserNotFound(user_id)
 
         if user.email != request.email:
             email_exists = user_repo.get_by_email(db, request.email)
             if email_exists:
-                raise HTTPException(status_code= 400, detail = "Email already exists")
+                raise EmailAlreadyExists(request.email)
 
         user.username = request.username.strip()
         user.email = request.email
